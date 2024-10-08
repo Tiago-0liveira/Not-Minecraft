@@ -165,15 +165,26 @@ int main() {
 	std::vector<GLfloat> vertices;
 	std::vector<GLuint> indices;
 
-	auto blockpos = glm::vec3(-2.0f);
-
-	CreateCubeData(blockpos, Sprites::GRASS, vertices, indices);
-	CreateCubeData(blockpos + glm::vec3(2.0f, 0.0f, 0.0f), Sprites::DIRT, vertices, indices);
-	CreateCubeData(blockpos + glm::vec3(4.0f, 0.0f, 0.0f), Sprites::COBBLESTONE, vertices, indices);
-
 	Sprites::SpriteManager sm;
 	Shader shader("shaders/BlockTexture/default.vert", "shaders/BlockTexture/default.frag");
 
+	Camera cam(window, WIN_WIDTH, WIN_HEIGHT);
+
+	// Generate a 10x10 grid of grass blocks below the player
+	glm::vec3 genBaseBlock = cam.cameraPos + glm::vec3(-5.0f, -2.0f, -5.0f);
+	int blockCount = 100;
+	std::cout << "Generating " << blockCount * blockCount << " blocks" << std::endl;
+	float time = glfwGetTime();
+	for (int x = 0; x < blockCount; x++)
+	{
+		for (int z = 0; z < blockCount; z++)
+		{
+			CreateCubeData(genBaseBlock + glm::vec3(x * 1.0f, 0.0f, z * 1.0f), Sprites::GRASS, vertices, indices);
+		}
+	}
+	std::cout << "Block generation took: " << (glfwGetTime() - time) * 1000 << "ms" << std::endl;
+
+	float curr =  glfwGetTime();
 	VAO VAO1;
 	VAO1.Bind();
 	VBO VBO1(vertices.data(), vertices.size() * sizeof(GLfloat));
@@ -186,17 +197,29 @@ int main() {
 
 	// bind to the shader
 	sm.texUnit(shader, "textureArray");
-
-	Camera cam(window, WIN_WIDTH, WIN_HEIGHT);
+	std::cout << "Texture array bound to shader took: " << (glfwGetTime() - curr) * 1000 << "ms" << std::endl;
 
 	double lastTime = glfwGetTime();
+
+	float fpsLastRead = glfwGetTime();
+	float fps = 0.0f;
+	float fpsMax = 0.0f;
+	float fpsMin = 10000.0f;
+
+	glfwSwapInterval(0);
 
 	while (!glfwWindowShouldClose(window)) {
 
 		// Fps and frameTime
 		float currentTime = glfwGetTime();
 		float delta = currentTime - lastTime;
-		float fps = 1.0f / delta;
+
+		if (glfwGetTime() - fpsLastRead >= 0.3f) {
+			fpsLastRead = glfwGetTime();
+			fps = 1.0f / delta;
+			if (fps > fpsMax) fpsMax = fps;
+			if (fps < fpsMin) fpsMin = fps;
+		}
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -220,13 +243,14 @@ int main() {
 
 		ImGui::Begin("Telemetry");
 
-		ImGui::Text("Fps: %.1f", setOneDecimal(fps));
+		ImGui::Text("Fps: %.1f  max: %.1f min: %.1f ", setOneDecimal(fps), setOneDecimal(fpsMin), setOneDecimal(fpsMax));
 		ImGui::Text("frame time: %.1f ms", setOneDecimal(delta * 1000));
-		ImGui::Text("Triangles: %d", indices.size() / 3);
+		ImGui::Text("Cubes: %d Triangles: %d", indices.size() / 36,  indices.size() / 3);
 		//ImGui::Text("Mouse trapped: %s", cam.isMouseTrapped ? "true" : "false");
 		ImGui::Text("Camera position: (%.1f, %.1f, %.1f)", cam.cameraPos.x, cam.cameraPos.y, cam.cameraPos.z);
 		ImGui::Text("Camera pitch: %.1f yaw: %.1f", Camera::pitch, Camera::yaw);
 		ImGui::SliderFloat("Speed", &Camera::speed, 4.5f, 50.0f);
+		ImGui::SliderFloat("Fov", &cam.fov, 40.0f, 120.0f);
 
 		ImGui::End();
 
