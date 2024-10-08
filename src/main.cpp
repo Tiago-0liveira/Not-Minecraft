@@ -105,6 +105,11 @@ void glfwErrorCallback(int error, const char* description) {
 	std::cerr << "Erro GLFW [" << error << "]: " << description << std::endl;
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	// Adjust the viewport to match the new window dimensions
+	glViewport(0, 0, width, height);
+}
+
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
 
@@ -138,6 +143,8 @@ int main() {
 		return -1;
 	}
 
+	// Register the framebuffer size callback
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	// Define a viewport (área de renderização)
 	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
 
