@@ -2,3 +2,4 @@ cmake-build*
 /imgui-cmake/imgui/
 /glew/
 /glfw/
+.idea
