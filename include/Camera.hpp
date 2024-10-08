@@ -37,12 +37,13 @@ public:
 	static float speed;
 	static float yaw;
 	static float pitch;
+	float fov = 60.0f;
 private:
+	glm::vec2 screenSize;
 	static const float nearest;
 	static const float farthest;
 	static const glm::vec3 cameraUp;
 	glm::mat4 view, projection;
-	float fov = 60.0f;
 
 public:
 	bool isMouseTrapped = true;

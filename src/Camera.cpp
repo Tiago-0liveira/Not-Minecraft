@@ -3,7 +3,7 @@
 float Camera::speed = 4.50f;
 const float Camera::sensitivity = 0.1f;
 const float Camera::nearest = 0.1f;
-const float Camera::farthest = 100.0f;
+const float Camera::farthest = 1000.0f;
 float Camera::yaw = -90.0f;
 float Camera::pitch = 0.0f;
 const glm::vec3 Camera::cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -48,6 +48,7 @@ void mouse_callbackImgui(GLFWwindow *window, double xpos, double ypos)
 }
 
 Camera::Camera(GLFWwindow* window, int width, int height)
+	: screenSize(width, height)
 {
 	view = glm::mat4(1.0f);
 	projection = glm::perspective(glm::radians(fov), static_cast<float>(width) / static_cast<float>(height), nearest, farthest);
@@ -78,11 +79,12 @@ void Camera::update(GLFWwindow* window, float delta)
 {
 	static float Gpressed = glfwGetTime();
 	glm::vec3 front;
+	projection = glm::perspective(glm::radians(fov), screenSize.x / screenSize.y, nearest, farthest);
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(front);
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	cameraFront = normalize(front);
+	view = lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
