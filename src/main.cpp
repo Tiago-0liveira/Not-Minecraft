@@ -27,18 +27,19 @@ float setOneDecimal(const float f)
 	return std::floor(f * 10) / 10;
 }
 
-void CreateCubeData(const glm::vec3 position, const float blockType, std::vector<float>& vertices, std::vector<unsigned int>& indices, const Sprites::SpriteSheet &spriteSheet) {
+void CreateCubeData(const glm::vec3 position, const Sprites::SpriteSheetName &face, std::vector<float>& vertices, std::vector<unsigned int>& indices) {
     // Get texture coordinates for each face from the sprite sheet
-    glm::vec2 frontTexCoords = spriteSheet.GetImageCoords(Sprites::FRONT);
-    glm::vec2 backTexCoords = spriteSheet.GetImageCoords(Sprites::BACK);
-    glm::vec2 leftTexCoords = spriteSheet.GetImageCoords(Sprites::LEFT);
-    glm::vec2 rightTexCoords = spriteSheet.GetImageCoords(Sprites::RIGHT);
-    glm::vec2 topTexCoords = spriteSheet.GetImageCoords(Sprites::TOP);
-    glm::vec2 bottomTexCoords = spriteSheet.GetImageCoords(Sprites::BOTTOM);
+	glm::vec2 frontTexCoords = {0.0f / 6, 0.0f};
+    glm::vec2 backTexCoords = {1.0f / 6, 0.0f};
+    glm::vec2 leftTexCoords = {2.0f / 6, 0.0f};
+    glm::vec2 rightTexCoords = {3.0f / 6, 0.0f};
+    glm::vec2 topTexCoords = {4.0f / 6, 0.0f};
+    glm::vec2 bottomTexCoords = {5.0f / 6, 0.0f};
 
+	float blockType = static_cast<float>(face);
     // Calculate the width and height of each individual face texture
-    float faceWidth = 1.0f / spriteSheet.size.x; // Assuming size is glm::ivec2 holding the number of sprites in x and y
-    float faceHeight = 1.0f / spriteSheet.size.y;
+    float faceWidth = 1.0f / 6; // Assuming size is glm::ivec2 holding the number of sprites in x and y
+    float faceHeight = 1.0f / 1;
 
     float cubeVertices[] = {
         // Positions                // Texture Coords                    // Block Type
@@ -157,22 +158,13 @@ int main() {
 	std::vector<GLfloat> vertices;
 	std::vector<GLuint> indices;
 
-	Sprites::SpriteManager sm;
-
-
 	auto blockpos = glm::vec3(-2.0f);
 
+	CreateCubeData(blockpos, Sprites::GRASS, vertices, indices);
+	CreateCubeData(blockpos + glm::vec3(2.0f, 0.0f, 0.0f), Sprites::DIRT, vertices, indices);
+	CreateCubeData(blockpos + glm::vec3(4.0f, 0.0f, 0.0f), Sprites::COBBLESTONE, vertices, indices);
 
-	const Sprites::SpriteSheet &Grass = sm.GetSpriteSheet(Sprites::GRASS);
-	const Sprites::SpriteSheet &Dirt = sm.GetSpriteSheet(Sprites::DIRT);
-	const Sprites::SpriteSheet &Cobble = sm.GetSpriteSheet(Sprites::COBBLESTONE);
-
-
-	CreateCubeData(blockpos, 0.0f, vertices, indices, Grass);
-	CreateCubeData(blockpos + glm::vec3(2.0f, 0.0f, 0.0f), 1.0f, vertices, indices, Dirt);
-	CreateCubeData(blockpos + glm::vec3(4.0f, 0.0f, 0.0f), 2.0f, vertices, indices, Cobble);
-
-
+	Sprites::SpriteManager sm;
 	Shader shader("shaders/BlockTexture/default.vert", "shaders/BlockTexture/default.frag");
 
 	VAO VAO1;
@@ -185,11 +177,11 @@ int main() {
 	VAO1.Unbind();
 	EBO1.Unbind();
 
+	// bind to the shader
 	sm.texUnit(shader, "textureArray");
 
 	Camera cam(window, WIN_WIDTH, WIN_HEIGHT);
 
-	float fps = 0;
 	double lastTime = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window)) {
@@ -197,7 +189,7 @@ int main() {
 		// Fps and frameTime
 		float currentTime = glfwGetTime();
 		float delta = currentTime - lastTime;
-		fps = 1.0f / delta;
+		float fps = 1.0f / delta;
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -252,7 +244,6 @@ int main() {
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
-	shader.Delete();
 
 	// Limpa os recursos do GLFW
 	glfwDestroyWindow(window);
