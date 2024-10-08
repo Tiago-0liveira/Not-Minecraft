@@ -7,7 +7,8 @@
 #include <stb_image.h>
 #include <format>
 
-#include "Shader.hpp"
+#include <Graphics/openGLThings.hpp>
+#include <Graphics/Shader.hpp>
 
 class Texture
 {

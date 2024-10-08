@@ -33,8 +33,14 @@ add_executable(Not_Minecraft src/main.cpp
         include/Graphics/Texture.hpp
         src/Camera.cpp
         include/Camera.hpp
-        src/Block.cpp
-        include/Block.hpp
+        src/ABlock.cpp
+        include/ABlock.hpp
+        src/Graphics/SpriteSheet.cpp
+        include/Graphics/SpriteSheet.hpp
+        src/Graphics/openGLThings.cpp
+        include/Graphics/openGLThings.hpp
+        src/Graphics/SpriteManager.cpp
+        include/Graphics/SpriteManager.hpp
 )
 target_link_libraries(Not_Minecraft PRIVATE libglew_static glfw imgui glm::glm)
 

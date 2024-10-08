@@ -1,12 +1,5 @@
 #include <Graphics/Texture.hpp>
 
-void checkOpenGLErrors(const std::string& msg) {
-	GLenum error;
-	while ((error = glGetError()) != GL_NO_ERROR) {
-		std::cout << "OpenGL error in " << msg << ": " << error << std::endl;
-	}
-}
-
 Texture::Texture(const char *filename, GLenum texType, GLenum slot, GLenum pixelType)
 {
 	type = texType;

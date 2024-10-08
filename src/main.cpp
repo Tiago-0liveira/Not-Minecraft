@@ -10,73 +10,95 @@
 
 #include <Camera.hpp>
 #include <Graphics/EBO.hpp>
-#include <Graphics/Texture.hpp>
 #include <Graphics/VAO.hpp>
 #include <Graphics/VBO.hpp>
+#include <Graphics/SpriteSheet.hpp>
+#include <Graphics/SpriteManager.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
-#include <array>
+
 
 float setOneDecimal(const float f)
 {
 	return std::floor(f * 10) / 10;
 }
 
-void addBlockVerticesAndIndices(std::vector<GLfloat> &Outvertices, std::vector<GLuint> &Outindices, const glm::vec3 &pos)
-{
-	std::array<GLfloat, 6 * 6 * 4> vertices = {
-		pos.x + -1.0f, pos.y + -1.0f, pos.z + -1.0f,   1.0f, 0.0f, 0.0f,  // 0: Left-bottom-back
-		pos.x +  1.0f, pos.y + -1.0f, pos.z + -1.0f,   0.0f, 0.0f, 0.0f,  // 1: Right-bottom-back
-		pos.x +  1.0f, pos.y +  1.0f, pos.z + -1.0f,   0.0f, 1.0f, 0.0f,  // 2: Right-top-back
-		pos.x + -1.0f, pos.y +  1.0f, pos.z + -1.0f,   1.0f, 1.0f, 0.0f,  // 3: Left-top-back
-		pos.x + -1.0f, pos.y + -1.0f, pos.z +  1.0f,   0.0f, 0.0f, 0.0f,  // 4: Left-bottom-front
-		pos.x +  1.0f, pos.y + -1.0f, pos.z +  1.0f,   1.0f, 0.0f, 0.0f,  // 5: Right-bottom-front
-		pos.x +  1.0f, pos.y +  1.0f, pos.z +  1.0f,   1.0f, 1.0f, 0.0f,  // 6: Right-top-front
-		pos.x + -1.0f, pos.y +  1.0f, pos.z +  1.0f,   0.0f, 1.0f, 0.0f,  // 7: Left-top-front
-		pos.x + -1.0f, pos.y + -1.0f, pos.z +  1.0f,   1.0f, 0.0f, 0.0f,  // 8: Left-bottom-front
-		pos.x + -1.0f, pos.y + -1.0f, pos.z + -1.0f,   0.0f, 0.0f, 0.0f,  // 9: Left-bottom-back
-		pos.x + -1.0f, pos.y +  1.0f, pos.z + -1.0f,   0.0f, 1.0f, 0.0f,  // 10: Left-top-back
-		pos.x + -1.0f, pos.y +  1.0f, pos.z +  1.0f,   1.0f, 1.0f, 0.0f,  // 11: Left-top-front
-		pos.x +  1.0f, pos.y + -1.0f, pos.z +  1.0f,   0.0f, 0.0f, 0.0f,  // 12: Right-bottom-front
-		pos.x +  1.0f, pos.y + -1.0f, pos.z + -1.0f,   1.0f, 0.0f, 0.0f,  // 13: Right-bottom-back
-		pos.x +  1.0f, pos.y +  1.0f, pos.z + -1.0f,   1.0f, 1.0f, 0.0f,  // 14: Right-top-back
-		pos.x +  1.0f, pos.y +  1.0f, pos.z +  1.0f,   0.0f, 1.0f, 0.0f,  // 15: Right-top-front
-		pos.x + -1.0f, pos.y + -1.0f, pos.z +  1.0f,   0.0f, 1.0f, 0.0f,  // 16: Left-bottom-front
-		pos.x +  1.0f, pos.y + -1.0f, pos.z +  1.0f,   1.0f, 1.0f, 0.0f,  // 17: Right-bottom-front
-		pos.x +  1.0f, pos.y + -1.0f, pos.z + -1.0f,   1.0f, 0.0f, 0.0f,  // 18: Right-bottom-back
-		pos.x + -1.0f, pos.y + -1.0f, pos.z + -1.0f,   0.0f, 0.0f, 0.0f,  // 19: Left-bottom-back
-		pos.x + -1.0f, pos.y +  1.0f, pos.z +  1.0f,   0.0f, 0.0f, 0.0f,  // 20: Left-top-front
-		pos.x +  1.0f, pos.y +  1.0f, pos.z +  1.0f,   1.0f, 0.0f, 0.0f,  // 21: Right-top-front
-		pos.x +  1.0f, pos.y +  1.0f, pos.z + -1.0f,   1.0f, 1.0f, 0.0f,  // 22: Right-top-back
-		pos.x + -1.0f, pos.y +  1.0f, pos.z + -1.0f,   0.0f, 1.0f, 0.0f   // 23: Left-top-back
-	};
+void CreateCubeData(const glm::vec3 position, const float blockType, std::vector<float>& vertices, std::vector<unsigned int>& indices, const Sprites::SpriteSheet &spriteSheet) {
+    // Get texture coordinates for each face from the sprite sheet
+    glm::vec2 frontTexCoords = spriteSheet.GetImageCoords(Sprites::FRONT);
+    glm::vec2 backTexCoords = spriteSheet.GetImageCoords(Sprites::BACK);
+    glm::vec2 leftTexCoords = spriteSheet.GetImageCoords(Sprites::LEFT);
+    glm::vec2 rightTexCoords = spriteSheet.GetImageCoords(Sprites::RIGHT);
+    glm::vec2 topTexCoords = spriteSheet.GetImageCoords(Sprites::TOP);
+    glm::vec2 bottomTexCoords = spriteSheet.GetImageCoords(Sprites::BOTTOM);
 
-	const GLuint offset = Outindices.size();
-	//std::cout << "Offset: " << offset << std::endl;
-	//std::cout << "Block position: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
-	std::array<GLuint, 6 * 6> indices = {
-		// Front face (CCW)
-		4 + offset, 5 + offset, 6 + offset, 4 + offset, 6 + offset, 7 + offset,
-		// Right face (CCW)
-		12 + offset, 13 + offset, 14 + offset, 12 + offset, 14 + offset, 15 + offset,
-		// Back face (CW)
-		0 + offset, 3 + offset, 2 + offset, 0 + offset, 2 + offset, 1 + offset,
-		// Left face (CW)
-		8 + offset, 11 + offset, 10 + offset, 8 + offset, 10 + offset, 9 + offset,
-		// Bottom face (CW)
-		16 + offset, 19 + offset, 18 + offset, 16 + offset, 18 + offset, 17 + offset,
-		// Top face (CCW)
-		20 + offset, 21 + offset, 22 + offset, 20 + offset, 22 + offset, 23 + offset,
-	};
+    // Calculate the width and height of each individual face texture
+    float faceWidth = 1.0f / spriteSheet.size.x; // Assuming size is glm::ivec2 holding the number of sprites in x and y
+    float faceHeight = 1.0f / spriteSheet.size.y;
 
+    float cubeVertices[] = {
+        // Positions                // Texture Coords                    // Block Type
+        // Front face
+        position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   frontTexCoords.x, frontTexCoords.y,   blockType,
+        position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   frontTexCoords.x + faceWidth, frontTexCoords.y,   blockType,
+        position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   frontTexCoords.x + faceWidth, frontTexCoords.y + faceHeight,   blockType,
+        position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   frontTexCoords.x, frontTexCoords.y + faceHeight,   blockType,
 
-	Outvertices.insert(Outvertices.end(), vertices.begin(), vertices.end());
-	Outindices.insert(Outindices.end(), indices.begin(), indices.end());
+        // Back face
+        position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   backTexCoords.x + faceWidth, backTexCoords.y,   blockType,
+        position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   backTexCoords.x + faceWidth, backTexCoords.y + faceHeight,   blockType,
+        position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   backTexCoords.x, backTexCoords.y + faceHeight,   blockType,
+        position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   backTexCoords.x, backTexCoords.y,   blockType,
+
+        // Left face
+        position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   leftTexCoords.x, leftTexCoords.y,   blockType,
+        position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   leftTexCoords.x + faceWidth, leftTexCoords.y,   blockType,
+        position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   leftTexCoords.x + faceWidth, leftTexCoords.y + faceHeight,   blockType,
+        position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   leftTexCoords.x, leftTexCoords.y + faceHeight,   blockType,
+
+        // Right face
+        position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   rightTexCoords.x + faceWidth, rightTexCoords.y,   blockType,
+        position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   rightTexCoords.x + faceWidth, rightTexCoords.y + faceHeight,   blockType,
+        position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   rightTexCoords.x, rightTexCoords.y + faceHeight,   blockType,
+        position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   rightTexCoords.x, rightTexCoords.y,   blockType,
+
+        // Top face
+        position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   topTexCoords.x, topTexCoords.y + faceHeight,   blockType,
+        position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   topTexCoords.x, topTexCoords.y,   blockType,
+        position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   topTexCoords.x + faceWidth, topTexCoords.y,   blockType,
+        position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   topTexCoords.x + faceWidth, topTexCoords.y + faceHeight,   blockType,
+
+        // Bottom face
+        position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   bottomTexCoords.x + faceWidth, bottomTexCoords.y + faceHeight,   blockType,
+        position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   bottomTexCoords.x, bottomTexCoords.y + faceHeight,   blockType,
+        position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   bottomTexCoords.x, bottomTexCoords.y,   blockType,
+        position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   bottomTexCoords.x + faceWidth, bottomTexCoords.y,   blockType,
+    };
+
+    // Append vertices to the vector
+    vertices.insert(vertices.end(), std::begin(cubeVertices), std::end(cubeVertices));
+
+    // Define the indices for the cube (as before)
+    const auto baseIndex = static_cast<unsigned int>(vertices.size() / 6 - 24);
+    unsigned int faceIndices[] = {
+        0, 1, 2, 2, 3, 0,         // Front face
+        4, 5, 6, 6, 7, 4,         // Back face
+        8, 9, 10, 10, 11, 8,      // Left face
+        12, 13, 14, 14, 15, 12,   // Right face
+        16, 17, 18, 18, 19, 16,   // Top face
+        20, 21, 22, 22, 23, 20    // Bottom face
+    };
+
+    // Append indices to the vector
+    for (const unsigned int faceIndice : faceIndices) {
+        indices.push_back(baseIndex + faceIndice);
+    }
 }
+
 
 void glfwErrorCallback(int error, const char* description) {
 	std::cerr << "Erro GLFW [" << error << "]: " << description << std::endl;
@@ -120,8 +142,8 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_FRONT);
+	glEnable(GL_CULL_FACE);
+
 
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -135,62 +157,21 @@ int main() {
 	std::vector<GLfloat> vertices;
 	std::vector<GLuint> indices;
 
-	/*auto blockpos = glm::vec3(1.0f, 1.0f, 1.0f);
-	addBlockVerticesAndIndices(vertices, indices, blockpos);
-	addBlockVerticesAndIndices(vertices, indices, blockpos + glm::vec3(2.0f, 0.0f, 0.0f));
-	addBlockVerticesAndIndices(vertices, indices, blockpos + glm::vec3(4.0f, 0.0f, 0.0f));*/
+	Sprites::SpriteManager sm;
 
-	int s = 9;
-	for (int i = 0; i < s; i++)
-	{
-		for (int j = 0; j < s; j++)
-		{
-			for (int w = 0; w < s; w++)
-			{
-				auto blockpos = glm::vec3(i * 2.0f, w * 2.0f, j * 2.0f);
-				addBlockVerticesAndIndices(vertices, indices, blockpos);
 
-			}
-		}
-	}
+	auto blockpos = glm::vec3(-2.0f);
 
-	auto blockpos = glm::vec3(0.0f, 0.0f, 0.0f);
-	for (int i = 0; i < 5; i++)
-	{
-		addBlockVerticesAndIndices(vertices, indices, blockpos);
-		blockpos += glm::vec3(-3.0f, 0.0f, 0.0f);
-	}
 
-	/*int i = 0;
-	for (GLfloat vertex : vertices)
-	{
-		if (i % 6 == 0) {
-			std::cout << std::endl;
-		}
-		if (i == 6 * 6 * 4)
-		{
-			std::cout << "Cube Vertices end" << std::endl;
-			i = 0;
-		}
-		std::cout << vertex << ", ";
-		i++;
-	}
+	const Sprites::SpriteSheet &Grass = sm.GetSpriteSheet(Sprites::GRASS);
+	const Sprites::SpriteSheet &Dirt = sm.GetSpriteSheet(Sprites::DIRT);
+	const Sprites::SpriteSheet &Cobble = sm.GetSpriteSheet(Sprites::COBBLESTONE);
 
-	std::cout << std::endl << "Indices" << std::endl;
-	i = 0;
-	for (GLuint index : indices)
-	{
-		if (i % 6 == 0) {
-			std::cout << std::endl;
-		}
-		if (i == 36)
-		{
-			std::cout << "Cube Indices end" << std::endl;
-			i = 0;
-		}
-		std::cout << index << ", ";
-		i++;
-	}*/
+
+	CreateCubeData(blockpos, 0.0f, vertices, indices, Grass);
+	CreateCubeData(blockpos + glm::vec3(2.0f, 0.0f, 0.0f), 1.0f, vertices, indices, Dirt);
+	CreateCubeData(blockpos + glm::vec3(4.0f, 0.0f, 0.0f), 2.0f, vertices, indices, Cobble);
+
 
 	Shader shader("shaders/BlockTexture/default.vert", "shaders/BlockTexture/default.frag");
 
@@ -200,14 +181,11 @@ int main() {
 	EBO EBO1(indices.data(), indices.size() * sizeof(GLuint));
 	GLsizeiptr stride = 6 * sizeof(GLfloat);
 	VAO1.LinkVBO(VBO1, 0, 3, GL_FLOAT, stride, nullptr);
-	VAO1.LinkVBO(VBO1, 1, 2, GL_FLOAT, stride, reinterpret_cast<void *>(3 * sizeof(GLfloat)));
-	VAO1.LinkVBO(VBO1, 2, 1, GL_FLOAT, stride, reinterpret_cast<void *>(5 * sizeof(GLfloat)));
+	VAO1.LinkVBO(VBO1, 1, 3, GL_FLOAT, stride, reinterpret_cast<void *>(3 * sizeof(GLfloat)));
 	VAO1.Unbind();
 	EBO1.Unbind();
 
-	//Texture Dirt("sprites/direction_test.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
-	Texture Dirt("sprites/blocks/dirt-side.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
-	Dirt.texUnit(shader, "tex", 0);
+	sm.texUnit(shader, "textureArray");
 
 	Camera cam(window, WIN_WIDTH, WIN_HEIGHT);
 
@@ -234,10 +212,12 @@ int main() {
 		shader.Activate();
 		cam.VAOBind(shader.ID);
 
-		Dirt.Bind();
+
+		sm.useTextures();
+
 		VAO1.Bind();
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
-
+		Sprites::SpriteManager::unuseTextures();
 
 		ImGui::Begin("Telemetry");
 

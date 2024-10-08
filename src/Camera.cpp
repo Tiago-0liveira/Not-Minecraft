@@ -4,11 +4,10 @@ float Camera::speed = 4.50f;
 const float Camera::sensitivity = 0.1f;
 const float Camera::nearest = 0.1f;
 const float Camera::farthest = 100.0f;
-float Camera::yaw = -50.0f;
+float Camera::yaw = -90.0f;
 float Camera::pitch = 0.0f;
 const glm::vec3 Camera::cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-//const glm::vec3 cameraPosDefault = glm::vec3(0.5f, 2.0f, 7.0f);
-const glm::vec3 cameraPosDefault = glm::vec3(-18.0f, 5.5f, 31.0f);
+const glm::vec3 cameraPosDefault = glm::vec3(0.0f, 1.0f, 8.0f);
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
