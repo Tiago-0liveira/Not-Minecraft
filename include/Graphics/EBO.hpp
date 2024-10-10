@@ -8,10 +8,11 @@ class EBO {
 public:
 	GLuint ID;
 	EBO(GLuint *indices, GLsizeiptr size);
+	~EBO();
 
-	void Bind();
-	void Unbind();
-	void Delete();
+	void Bind() const;
+	static void Unbind();
+	void Delete() const;
 };
 
 #endif //EBO_HPP

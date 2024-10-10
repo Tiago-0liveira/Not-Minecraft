@@ -33,14 +33,21 @@ add_executable(Not_Minecraft src/main.cpp
         include/Graphics/Texture.hpp
         src/Camera.cpp
         include/Camera.hpp
-        src/ABlock.cpp
-        include/ABlock.hpp
+        include/WorldGen/Block.hpp
         src/Graphics/SpriteSheet.cpp
         include/Graphics/SpriteSheet.hpp
         src/Graphics/openGLThings.cpp
         include/Graphics/openGLThings.hpp
         src/Graphics/SpriteManager.cpp
         include/Graphics/SpriteManager.hpp
+        src/ImguiDebugUi.cpp
+        include/Graphics/ImguiDebugUi.hpp
+        src/WorldGen/WorldGen.cpp
+        include/WorldGen/WorldGen.hpp
+        src/WorldGen/Chunk.cpp
+        include/WorldGen/Chunk.hpp
+        src/WorldGen/World.cpp
+        include/WorldGen/World.hpp
 )
 target_link_libraries(Not_Minecraft PRIVATE libglew_static glfw imgui glm::glm)
 

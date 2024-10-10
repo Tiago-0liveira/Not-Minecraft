@@ -8,7 +8,7 @@ namespace Sprites
 			throw std::runtime_error(std::format("Image size must be square: x:%d y:%d\n", imageSize.x, imageSize.y));
 		}
 		int nrChannels;
-		_data = stbi_load(path, &pixels.x, &pixels.y, &nrChannels, 4);
+		_data = stbi_load((SPRITE_BASE_PATH + path).c_str(), &pixels.x, &pixels.y, &nrChannels, 4);
 
 		if (!_data)
 			throw std::runtime_error(std::format("Failed to load texture: %s\n", path));

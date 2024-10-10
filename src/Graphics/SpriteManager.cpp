@@ -2,14 +2,19 @@
 
 namespace Sprites
 {
+	const char *SpriteManager::textureNames[NUM_SPRITESHEETS] = {
+		"DIRT",
+		"GRASS",
+		"COBBLESTONE",
+	};
 
 	SpriteManager::SpriteManager(const glm::ivec2 &imageSize)
 	: imageSize(imageSize)
 	{
 		_sprites.resize(NUM_SPRITESHEETS);
-		_sprites[DIRT] = std::move(SpriteSheet("sprites/blocks/dirt.png"));
-		_sprites[GRASS] = std::move(SpriteSheet("sprites/blocks/grass.png"));
-		_sprites[COBBLESTONE] = std::move(SpriteSheet("sprites/blocks/cobblestone.png"));
+		_sprites[DIRT] = std::move(SpriteSheet("dirt.png"));
+		_sprites[GRASS] = std::move(SpriteSheet("grass.png"));
+		_sprites[COBBLESTONE] = std::move(SpriteSheet("cobblestone.png"));
 
 		glGenTextures(1, &textureArrayID);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, textureArrayID);
@@ -18,9 +23,11 @@ namespace Sprites
 
 		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, si.x, si.y, static_cast<int>(NUM_SPRITESHEETS), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 		checkOpenGLErrors("SpriteManager::SpriteManager glTexImage3D");
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		//glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+		checkOpenGLErrors("SpriteManager::SpriteManager glGenerateMipmap");
 		// Upload each sprite sheet to the texture array
 		for (GLint i = 0; i < _sprites.size(); ++i)
 		{
@@ -47,7 +54,7 @@ namespace Sprites
 
 	SpriteManager::~SpriteManager() = default;
 
-	const SpriteSheet &SpriteManager::GetSpriteSheet(SpriteSheetName name) const
+	const SpriteSheet &SpriteManager::GetSpriteSheet(BlockType name) const
 	{
 		auto n = static_cast<short>(name);
 		if (n < 0 || n >= _sprites.size()) {
