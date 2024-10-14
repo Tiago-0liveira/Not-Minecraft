@@ -6,6 +6,7 @@ namespace Sprites
 		"DIRT",
 		"GRASS",
 		"COBBLESTONE",
+		"STONE"
 	};
 
 	SpriteManager::SpriteManager(const glm::ivec2 &imageSize)
@@ -15,6 +16,7 @@ namespace Sprites
 		_sprites[DIRT] = std::move(SpriteSheet("dirt.png"));
 		_sprites[GRASS] = std::move(SpriteSheet("grass.png"));
 		_sprites[COBBLESTONE] = std::move(SpriteSheet("cobblestone.png"));
+		_sprites[STONE] = std::move(SpriteSheet("stone.png"));
 
 		glGenTextures(1, &textureArrayID);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, textureArrayID);

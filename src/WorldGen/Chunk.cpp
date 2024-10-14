@@ -16,8 +16,8 @@ namespace WorldGen
 	void Chunk::gen(const glm::vec3 &pos)
 	{
 		position = pos;
-		vertices.reserve(baseSize.x * baseSize.y * size.z * Block::numVertices);
-		indices.reserve(baseSize.x * baseSize.y * size.z * Block::numIndices);
+		//vertices.reserve(baseSize.x * 2 + size.z * );
+		//indices.reserve(baseSize.x * baseSize.y * size.z * Block::numIndices);
 		Sprites::BlockType blockType;
 
 		for (int x = 0; x < size.x; x++)
@@ -26,14 +26,22 @@ namespace WorldGen
 			{
 				if (y > baseSize.y - 2) blockType = Sprites::BlockType::GRASS;
 				else if (y > baseSize.y - 5) blockType = Sprites::BlockType::DIRT;
-				else blockType = Sprites::BlockType::COBBLESTONE;
+				else blockType = Sprites::BlockType::STONE;
 				for (int z = 0; z < size.z; z++)
 				{
 					const int idx = x + (y * size.x) + (z * size.x * baseSize.y);
 					auto &[pos, type] = blocks[idx];
 					pos = glm::vec3(x, y, z) + position;
 					type = blockType;
-					WorldGen::CreateCubeData(pos, blockType, vertices, indices);
+
+					//CreateCubeData(pos, blockType, vertices, indices);
+
+					CubeData cubeData = CreateCubeDataNew(pos, blockType, indices);
+					vertices.insert(vertices.end(), cubeData.vertices.begin(), cubeData.vertices.end());
+					indices.insert(indices.end(), cubeData.indices.begin(), cubeData.indices.end());
+					//CubeData cubeData = CreateCubeData(pos, blockType, indices.size());
+					//vertices.insert(vertices.end(), cubeData.vertices.begin(), cubeData.vertices.end());
+					//indices.insert(indices.end(), cubeData.indices.begin(), cubeData.indices.end());
 				}
 			}
 		}

@@ -6,7 +6,7 @@
 
 namespace WorldGen
 {
-	#define CHUNKS_NUM 16
+	#define CHUNKS_NUM 4
 	#define THREADS_NUM_DEFAULT 8
 	#define TIME_GEN_CHUNKS
 
@@ -35,7 +35,7 @@ namespace WorldGen
 		bool finnishedGen = false;
 
 #ifdef TIME_GEN_CHUNKS
-		time_t startTime;
+		std::chrono::steady_clock::time_point startTime;
 		bool time_gen_bool;
 #endif
 	};

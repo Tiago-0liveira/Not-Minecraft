@@ -48,6 +48,8 @@ add_executable(Not_Minecraft src/main.cpp
         include/WorldGen/Chunk.hpp
         src/WorldGen/World.cpp
         include/WorldGen/World.hpp
+        src/Player.cpp
+        include/Player.hpp
 )
 target_link_libraries(Not_Minecraft PRIVATE libglew_static glfw imgui glm::glm)
 

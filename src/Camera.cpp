@@ -6,8 +6,8 @@ const float Camera::nearest = 0.1f;
 const float Camera::farthest = 1000.0f;
 float Camera::yaw = 0.1f;
 float Camera::pitch = 0.1f;
-const glm::vec3 Camera::cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-const glm::vec3 cameraPosDefault = glm::vec3(0.0f, 17.0f, 0.0f);
+constexpr glm::vec3 Camera::cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+constexpr auto cameraPosDefault = glm::vec3(0.0f, 17.0f, 0.0f);
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
@@ -18,7 +18,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 	}
 
 	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to top
+	float yoffset = lastY - ypos;// Reversed since y-coordinates go from bottom to top
 	lastX = xpos;
 	lastY = ypos;
 
@@ -128,7 +128,7 @@ void Camera::keyboardMovement(GLFWwindow* window, float delta)
 		cameraPos -= cameraUp * velocity;
 }
 
-void Camera::VAOBind(GLuint ID)
+void Camera::VAOBind(GLuint ID) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));

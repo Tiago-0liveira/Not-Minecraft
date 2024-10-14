@@ -25,6 +25,7 @@
 #include <Graphics/ImguiDebugUi.hpp>
 #include <WorldGen/WorldGen.hpp>
 
+#include "Player.hpp"
 #include "WorldGen/Chunk.hpp"
 #include "WorldGen/World.hpp"
 
@@ -80,7 +81,7 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 
 
 	ImGui::CreateContext();
@@ -94,9 +95,11 @@ int main()
 
 
 	Sprites::SpriteManager sm;
-	Shader shader("shaders/BlockTexture/default.vert", "shaders/BlockTexture/default.frag");
+	Shader ShaderBlockTextures("shaders/BlockTexture/default.vert", "shaders/BlockTexture/default.frag");
+	Shader ShaderBlockSelected("shaders/BlockSelected/default.vert", "shaders/BlockSelected/default.frag");
 
-	Camera cam(window, WIN_WIDTH, WIN_HEIGHT);
+	//Camera cam(window, WIN_WIDTH, WIN_HEIGHT);
+	Player player(window, WIN_WIDTH, WIN_HEIGHT);
 
 	std::vector<GLfloat> vertices;
 	std::vector<GLuint> indices;
@@ -106,7 +109,8 @@ int main()
 	bool hasToRegen = false;
 
 
-	sm.texUnit(shader, "textureArray");
+	sm.texUnit(ShaderBlockTextures, "textureArray");
+	//glUniform1i(ShaderBlockSelected.GetUniformLocation("uniform"), 0);
 
 	double lastTime = glfwGetTime();
 
@@ -123,7 +127,7 @@ int main()
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		cam.update(window, delta);
+		player.getCamera().update(window, delta);
 
 		if (hasToRegen) {
 			//vao.UpdateBuffers(vertices, indices);
@@ -133,22 +137,23 @@ int main()
 		world->checkGenFinnished();
 #endif
 		world->Update();
+		player.Update();
 
-		shader.Activate();
-		cam.VAOBind(shader.ID);
-
+		ShaderBlockSelected.Activate();
+		player.getCamera().VAOBind(ShaderBlockSelected.ID);
+		player.Draw();
+		ShaderBlockTextures.Activate();
+		player.getCamera().VAOBind(ShaderBlockTextures.ID);
 		sm.useTextures();
 
 		world->Draw();
-		//chunk.Draw();
-		//vao.Bind();
-		//glDrawElements(GL_TRIANGLES, vao.verticesNum, GL_UNSIGNED_INT, nullptr);
+
 		Sprites::SpriteManager::unuseTextures();
 		VAO::Unbind();
 
 		// Imgui
-		ImguiTelemetry(delta, cam, indices.size() / 3);
-		ImguiWorldGen(vertices, indices, cam, hasToRegen);
+		ImguiTelemetry(delta, player, indices.size() / 3);
+		ImguiWorldGen(vertices, indices, player.getCamera(), hasToRegen);
 
 
 		ImGui::Render();

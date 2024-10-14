@@ -8,6 +8,9 @@ namespace WorldGen::Block
 {
 	static constexpr unsigned int numVertices = 144;
 	static constexpr unsigned int numIndices = 36;
+	static constexpr unsigned int numVerticesLine = 24;
+	static constexpr unsigned int numIndicesLine = 32;
+
 	struct BlockData
 	{
 		glm::ivec3 pos = {0, 0, 0};

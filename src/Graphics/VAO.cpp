@@ -6,32 +6,36 @@ VAO::VAO(std::vector<GLfloat> &vertices, std::vector<GLuint> &indices, const std
 	for (auto &component : components)
 		stride += component * sizeof(GLfloat);
 
+	glGenVertexArrays(1, &ID);
 	UpdateBuffers(vertices, indices);
 }
 
 void VAO::UpdateBuffers(std::vector<GLfloat>& vertices, std::vector<GLuint>& indices) {
-	if (ebo != nullptr) {
-		delete ebo;
-		ebo = nullptr;
-	}
-	if (vbo != nullptr) {
-		delete vbo;
-		vbo = nullptr;
-	}
-	Delete();
-	glGenVertexArrays(1, &ID);
-	checkOpenGLErrors("VAO::VAO glGenVetexArrays");
 
 	Bind();
-	ebo = new EBO(indices.data(), indices.size() * sizeof(GLuint));
-	vbo = new VBO(vertices.data(), vertices.size() * sizeof(GLfloat));
+	if (ebo == nullptr) {
+		ebo = new EBO(indices.data(), indices.size() * sizeof(GLuint));
+		if (ebo == nullptr)
+			throw std::runtime_error("Failed to create EBO");
+	} else
+	{
+		ebo->updateData(indices.data(), indices.size() * sizeof(GLuint));
+	}
+	if (vbo == nullptr) {
+		vbo = new VBO(vertices.data(), vertices.size() * sizeof(GLfloat));
+		if (vbo == nullptr)
+			throw std::runtime_error("Failed to create VBO");
+	} else
+	{
+		vbo->updateData(vertices.data(), vertices.size() * sizeof(GLfloat));
+	}
 
 	layout = 0;  // Reset the layout index
 	offset = nullptr;  // Reset the offset
 	verticesNum = indices.size();
 
-	for (auto &component : components)
-		LinkVBO(component, GL_FLOAT);
+	for (auto &size : components)
+		LinkVBO(size, GL_FLOAT);
 
 	Unbind();
 }

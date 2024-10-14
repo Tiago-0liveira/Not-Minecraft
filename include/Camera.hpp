@@ -26,7 +26,7 @@ public:
 	~Camera();
 
 	void update(GLFWwindow* window, float delta);
-	void VAOBind(GLuint ID);
+	void VAOBind(GLuint ID) const;
 
 	void trapMouse(GLFWwindow *window);
 	void freeMouse(GLFWwindow *window);

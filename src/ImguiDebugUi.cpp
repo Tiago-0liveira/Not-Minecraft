@@ -1,11 +1,15 @@
 #include <Graphics/ImguiDebugUi.hpp>
 
-void ImguiTelemetry(float delta, Camera &cam, unsigned int triangles)
+
+
+void ImguiTelemetry(float delta, Player &player, unsigned int triangles)
 {
 	static float fps = 0.0f, fpsMin = 10000.0f, fpsMax = 0.0f;
 	static float fpsLastRead = glfwGetTime();
 	static float frameTime = 0.0f;
 	static bool vsync = true;
+
+	Camera &cam = player.getCamera();
 
 	if (glfwGetTime() - fpsLastRead >= 0.3f) {
 		fpsLastRead = glfwGetTime();
@@ -25,6 +29,7 @@ void ImguiTelemetry(float delta, Camera &cam, unsigned int triangles)
 	ImGui::Text("frame time: %.1f ms", frameTime);
 	ImGui::Text("Cubes: %u Triangles: %u", triangles / 12,  triangles);
 	ImGui::Text("Camera position: (%.1f, %.1f, %.1f)", cam.cameraPos.x, cam.cameraPos.y, cam.cameraPos.z);
+	ImGui::Text("Selected block position: (%.1f, %.1f, %.1f)", player.selectedBlockPos.x, player.selectedBlockPos.y, player.selectedBlockPos.z);
 	ImGui::Text("Camera pitch: %.1f yaw: %.1f", Camera::pitch, Camera::yaw);
 	ImGui::SliderFloat("Speed", &Camera::speed, 4.5f, 50.0f);
 	ImGui::SliderFloat("Fov", &cam.fov, 40.0f, 120.0f);

@@ -18,9 +18,11 @@ namespace Sprites
 		DIRT = 0,
 		GRASS,
 		COBBLESTONE,
+		STONE,
 
+		AIR,
 		// Number of SpriteSheets
-		NUM_SPRITESHEETS
+		NUM_SPRITESHEETS = AIR /* does not exist as a block */
 	};
 	std::ostream &operator<<(std::ostream &os, const BlockType &name);
 
