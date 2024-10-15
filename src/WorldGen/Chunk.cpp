@@ -17,6 +17,7 @@ namespace WorldGen
 	{
 		this->position = position;
 		Sprites::BlockType blockType;
+		saveBounds();
 
 		for (int y = 0; y < baseSize.y; y++)
 		{
@@ -64,6 +65,34 @@ namespace WorldGen
 		}
 
 		genAtom.store(true);
+	}
+
+	void Chunk::saveBounds()
+	{
+		/* From position populate a bounds mat that will have all 4 corners */
+		/* It should be calculated from position but it need some math, remember the chunks are baseSize (this is a ivec2 with x and z sizes) */
+		/* The bounds should be a 2x4 matrix */
+
+		glm::vec2 origin = glm::vec2(
+			fmod(position.x, baseSize.x),
+			fmod(position.z, baseSize.y)
+		);
+		if (origin.x < 0)
+			origin.x *= -1;
+		if (origin.y < 0)
+			origin.y *= -1;
+
+		origin.x = position.x - origin.x;
+		origin.y = position.z - origin.y;
+
+		bounds[0] = glm::ivec2(origin.x, origin.y);
+		bounds[1] = glm::ivec2(origin.x + baseSize.x, origin.y + baseSize.y);
+	}
+
+	bool Chunk::isInside(const glm::vec3 &pos) const
+	{
+		return pos.x >= bounds[0].x && pos.x <= bounds[1].x &&
+				pos.z >= bounds[0].y && pos.z <= bounds[1].y;
 	}
 
 	void Chunk::createVAO()

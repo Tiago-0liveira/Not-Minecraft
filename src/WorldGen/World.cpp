@@ -36,11 +36,15 @@ namespace WorldGen
 		std::mutex mtx;
 		std::condition_variable cv;
 		std::atomic activeThreads(0);
-		auto base_pos = glm::vec3(-CHUNKS_NUM * Chunk::size.x / 2 , 0, -CHUNKS_NUM * Chunk::size.z / 2);
+		constexpr auto startPos = glm::ivec2(
+			-CHUNKS_NUM * Chunk::size.x / 2,
+			-CHUNKS_NUM * Chunk::size.z / 2
+		);
+		constexpr auto base_pos = glm::vec3(startPos.x - startPos.x % Chunk::size.x, 0, startPos.y - startPos.y % Chunk::size.z);
 
 #ifdef TIME_GEN_CHUNKS
 		time_gen_bool = false;
-		startTime = std::chrono::high_resolution_clock::now();;
+		startTime = std::chrono::high_resolution_clock::now();
 #endif
 
 

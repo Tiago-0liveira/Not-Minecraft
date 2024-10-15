@@ -23,6 +23,8 @@ namespace WorldGen
 		~Chunk();
 
 		void gen(const glm::vec3 &position);
+		void saveBounds();
+		bool isInside(const glm::vec3 &pos) const;
 		void createVAO();
 		void Draw();
 
@@ -38,6 +40,7 @@ namespace WorldGen
 		std::vector<GLuint> indices;
 		VAO *vao = nullptr;
 		glm::vec3 position;
+		glm::ivec2 bounds[2];
 	};
 
 	struct ChunkLayer

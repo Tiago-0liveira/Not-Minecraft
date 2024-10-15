@@ -108,9 +108,7 @@ int main()
 
 	bool hasToRegen = false;
 
-
 	sm.texUnit(ShaderBlockTextures, "textureArray");
-	//glUniform1i(ShaderBlockSelected.GetUniformLocation("uniform"), 0);
 
 	double lastTime = glfwGetTime();
 
@@ -153,7 +151,8 @@ int main()
 
 		// Imgui
 		ImguiTelemetry(delta, player, indices.size() / 3);
-		ImguiWorldGen(vertices, indices, player.getCamera(), hasToRegen);
+		// Not being used atm
+		//ImguiWorldGen(vertices, indices, player.getCamera(), hasToRegen);
 
 
 		ImGui::Render();
