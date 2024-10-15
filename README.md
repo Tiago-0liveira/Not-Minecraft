@@ -4,7 +4,8 @@
 
 ## Features
 
-- Renders a block with one texture
+- Renders Chunks (not random for now) with blocks
+- Optimized rendering (only renders visible faces (of each chunk, will later be updated))
 - Camera movement
 
 
@@ -28,20 +29,21 @@ git clone https://github.com/Tiago-0liveira/Not-Minecraft.git --recursive
 ```
 This ensures you download all the submodules that are needed for the project.
 
-### Now lets setup the project:
+### Project Setup:
 ```cmd
 cd Not-Minecraft
 mkdir build
 cd build
 cmake ..
 ```
-### Now lets build:
+### Building for the first time:
 This is only for the first time you build the project. After that you can just run the following command to build the project:
 ```cmd
 cd build
 cmake --build .
 ```
 
+### Building the project:
 Now to run the project you can just run the following command:
 ```cmd
 build\Debug\Not_Minecraft.exe
