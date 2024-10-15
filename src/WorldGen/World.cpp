@@ -54,10 +54,8 @@ namespace WorldGen
 						}
 						++activeThreads; // Increment the count of active threads
 					}
-
 					// Generate the chunk
 					chunks[i][j].gen(base_pos + glm::vec3(i * Chunk::size.x, 0, j * Chunk::size.z));
-
 					{
 						std::unique_lock lock(mtx);
 						--activeThreads; // Decrement the count of active threads

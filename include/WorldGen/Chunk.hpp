@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <Graphics/VAO.hpp>
 #include "WorldGen/WorldGen.hpp"
+#include <random>
 
 #include <thread>
 #include "Block.hpp"
@@ -12,6 +13,7 @@ namespace WorldGen
 {
 	#define CHUNKS_BASE_SIZE 16
 	#define CHUNKS_HEIGHT 25
+	struct ChunkLayer;
 
 	class Chunk
 	{
@@ -31,11 +33,21 @@ namespace WorldGen
 	private:
 		static const std::vector<GLfloat> shaderComponents;
 
-		Block::BlockData blocks[baseSize.x * baseSize.y * size.z] = {};
+		std::vector<ChunkLayer> chunkLayers;
 		std::vector<GLfloat> vertices;
 		std::vector<GLuint> indices;
 		VAO *vao = nullptr;
 		glm::vec3 position;
+	};
+
+	struct ChunkLayer
+	{
+		ChunkLayer(const glm::vec3 &pos, const Sprites::BlockType &type);
+
+		void Update();
+
+		Block::BlockData blocks[Chunk::baseSize.x * Chunk::baseSize.y];
+		unsigned int airBlocks = 0;
 	};
 }
 

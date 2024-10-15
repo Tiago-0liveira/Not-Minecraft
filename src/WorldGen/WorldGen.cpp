@@ -6,6 +6,113 @@
 
 namespace WorldGen
 {
+	CubeDetailedData CreateCubeDetailedData(const glm::vec3 &position, const Sprites::BlockType &blockType, const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices, uint8_t faces)
+	{
+		unsigned int baseIndex = indices.empty() ? 0: indices.back() + 4;
+		constexpr float backTexCoordsX = 1.0f / 6;
+		constexpr float leftTexCoordsX = 2.0f / 6;
+		constexpr float rightTexCoordsX = 3.0f / 6;
+		constexpr float topTexCoordsX = 4.0f / 6;
+		constexpr float bottomTexCoordsX = 5.0f / 6;
+		constexpr float faceWidth = 1.0f / 6;
+
+		const auto blockTypeFloat = static_cast<float>(blockType);
+
+		// create bools from SpriteSheetFace
+		const bool front = Sprites::FRONT & faces;
+		const bool back = Sprites::BACK & faces;
+		const bool left = Sprites::LEFT & faces;
+		const bool right = Sprites::RIGHT & faces;
+		const bool top = Sprites::TOP & faces;
+		const bool bottom = Sprites::BOTTOM & faces;
+
+		std::vector<GLfloat> newVertices;
+		std::vector<GLuint> newIndices;
+
+		if (front)
+		{
+			newVertices.insert(newVertices.end(), {
+				position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   0,		  0,		    blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   faceWidth, 0,			blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   faceWidth, 1,   blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   0,		  1,   blockTypeFloat,
+			});
+			newIndices.insert(newIndices.end(), {
+				0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+			});
+			baseIndex += 4;
+		}
+		if (back)
+		{
+			newVertices.insert(newVertices.end(), {
+				position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   backTexCoordsX + faceWidth, 0,   blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   backTexCoordsX + faceWidth, 1,   blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   backTexCoordsX, 1,   blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   backTexCoordsX, 0,   blockTypeFloat,
+			});
+			newIndices.insert(newIndices.end(), {
+				0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+			});
+			baseIndex += 4;
+		}
+		if (left)
+		{
+			newVertices.insert(newVertices.end(), {
+				position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   leftTexCoordsX, 0,   blockTypeFloat,
+				position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   leftTexCoordsX + faceWidth, 0,   blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   leftTexCoordsX + faceWidth, 1,   blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   leftTexCoordsX, 1,   blockTypeFloat,
+			});
+			newIndices.insert(newIndices.end(), {
+				0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+			});
+			baseIndex += 4;
+		}
+		if (right)
+		{
+			newVertices.insert(newVertices.end(), {
+				position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   rightTexCoordsX + faceWidth, 0,   blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   rightTexCoordsX + faceWidth, 1,   blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   rightTexCoordsX, 1,   blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   rightTexCoordsX, 0,   blockTypeFloat,
+			});
+			newIndices.insert(newIndices.end(), {
+				0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+			});
+			baseIndex += 4;
+		}
+		if (top)
+		{
+			newVertices.insert(newVertices.end(), {
+				position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   topTexCoordsX, 1,   blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   topTexCoordsX, 0,   blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   topTexCoordsX + faceWidth, 0,   blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   topTexCoordsX + faceWidth, 1,   blockTypeFloat,
+			});
+			newIndices.insert(newIndices.end(), {
+				0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+			});
+			baseIndex += 4;
+		}
+		if (bottom)
+		{
+			newVertices.insert(newVertices.end(), {
+				position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   bottomTexCoordsX + faceWidth, 1,   blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   bottomTexCoordsX, 1,   blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   bottomTexCoordsX, 0,   blockTypeFloat,
+				position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   bottomTexCoordsX + faceWidth, 0,   blockTypeFloat,
+			});
+			newIndices.insert(newIndices.end(), {
+				0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+			});
+		}
+
+		return {
+			.vertices = newVertices,
+			.indices = newIndices,
+			.blockType = blockType
+		};
+	}
 	CubeData CreateCubeDataNew(const glm::vec3 &position, const Sprites::BlockType &blockType, const std::vector<GLuint> &indices)
 	{
 		const unsigned int baseIndex = indices.empty() ? 0: indices.back() + 4;

@@ -21,12 +21,13 @@ namespace Sprites
 
 	enum SpriteSheetFace
 	{
-		FRONT = 0,
-		BACK,
-		LEFT,
-		RIGHT,
-		TOP,
-		BOTTOM
+		FRONT = 0x01,
+		BACK = 0x02,
+		LEFT = 0x04,
+		RIGHT = 0x08,
+		TOP = 0x10,
+		BOTTOM = 0x20,
+		ALL = 0xFF
 	};
 
 	class SpriteSheet

@@ -6,7 +6,7 @@
 
 namespace WorldGen
 {
-	#define CHUNKS_NUM 4
+	#define CHUNKS_NUM 16
 	#define THREADS_NUM_DEFAULT 8
 	#define TIME_GEN_CHUNKS
 

@@ -1,5 +1,5 @@
-#include <random>
 #include <WorldGen/Chunk.hpp>
+
 
 
 namespace WorldGen
@@ -13,35 +13,52 @@ namespace WorldGen
 		gen(position);
 	}
 
-	void Chunk::gen(const glm::vec3 &pos)
+	void Chunk::gen(const glm::vec3 &position)
 	{
-		position = pos;
-		//vertices.reserve(baseSize.x * 2 + size.z * );
-		//indices.reserve(baseSize.x * baseSize.y * size.z * Block::numIndices);
+		this->position = position;
 		Sprites::BlockType blockType;
 
-		for (int x = 0; x < size.x; x++)
+		for (int y = 0; y < baseSize.y; y++)
 		{
-			for (int y = 0; y < baseSize.y; y++)
+			if (y > baseSize.y - 2) blockType = Sprites::BlockType::GRASS;
+			else if (y > baseSize.y - 5) blockType = Sprites::BlockType::DIRT;
+			else blockType = Sprites::BlockType::STONE;
+			chunkLayers.emplace_back(glm::vec3(position.x, y, position.z), blockType);
+		}
+		std::cout << "Chunk generated at " << position.x << " " << position.y << " " << position.z << std::endl;
+		const unsigned long layers = chunkLayers.size();
+		for (int layerI = 0; layerI < layers; layerI++)
+		{
+			auto &layer = chunkLayers[layerI];
+			for (int x = 0; x < baseSize.x; x++)
 			{
-				if (y > baseSize.y - 2) blockType = Sprites::BlockType::GRASS;
-				else if (y > baseSize.y - 5) blockType = Sprites::BlockType::DIRT;
-				else blockType = Sprites::BlockType::STONE;
-				for (int z = 0; z < size.z; z++)
+				for (int z = 0; z < baseSize.y; z++)
 				{
-					const int idx = x + (y * size.x) + (z * size.x * baseSize.y);
-					auto &[pos, type] = blocks[idx];
-					pos = glm::vec3(x, y, z) + position;
-					type = blockType;
-
-					//CreateCubeData(pos, blockType, vertices, indices);
-
-					CubeData cubeData = CreateCubeDataNew(pos, blockType, indices);
+					const unsigned int i = baseSize.x * x + z;
+					auto &[pos, type] = layer.blocks[i];
+					if (type == Sprites::BlockType::AIR)
+					{
+						layer.airBlocks++;
+						continue;
+					}
+					uint8_t faces = 0;
+					if (z + 1 >= baseSize.y || chunkLayers[layerI].blocks[baseSize.x * x + (z + 1)].type == Sprites::BlockType::AIR)
+						faces |= Sprites::SpriteSheetFace::FRONT;
+					if (z - 1 < 0 || chunkLayers[layerI].blocks[baseSize.x * x + (z - 1)].type == Sprites::BlockType::AIR)
+						faces |= Sprites::SpriteSheetFace::BACK;
+					if (x - 1 < 0 || chunkLayers[layerI].blocks[baseSize.x * (x - 1) + z].type == Sprites::BlockType::AIR)
+						faces |= Sprites::SpriteSheetFace::LEFT;
+					if (x + 1 >= baseSize.x || chunkLayers[layerI].blocks[baseSize.x * (x + 1) + z].type == Sprites::BlockType::AIR)
+						faces |= Sprites::SpriteSheetFace::RIGHT;
+					if (layerI + 1 >= chunkLayers.size() || chunkLayers[layerI + 1].blocks[i].type == Sprites::BlockType::AIR)
+						faces |= Sprites::SpriteSheetFace::TOP;
+					if (layerI - 1 < 0 || chunkLayers[layerI - 1].blocks[i].type == Sprites::BlockType::AIR)
+						faces |= Sprites::SpriteSheetFace::BOTTOM;
+					if (faces == 0)
+						continue;
+					const CubeDetailedData cubeData = CreateCubeDetailedData(pos, type, vertices, indices, faces);
 					vertices.insert(vertices.end(), cubeData.vertices.begin(), cubeData.vertices.end());
 					indices.insert(indices.end(), cubeData.indices.begin(), cubeData.indices.end());
-					//CubeData cubeData = CreateCubeData(pos, blockType, indices.size());
-					//vertices.insert(vertices.end(), cubeData.vertices.begin(), cubeData.vertices.end());
-					//indices.insert(indices.end(), cubeData.indices.begin(), cubeData.indices.end());
 				}
 			}
 		}
@@ -67,6 +84,26 @@ namespace WorldGen
 		vao->Bind();
 		glDrawElements(GL_TRIANGLES, vao->verticesNum, GL_UNSIGNED_INT, nullptr);
 		vao->Unbind();
+	}
+
+	ChunkLayer::ChunkLayer(const glm::vec3 &pos, const Sprites::BlockType &type)
+	{
+		for (int x = 0; x < Chunk::baseSize.x; x++)
+		{
+			for (int z = 0; z < Chunk::baseSize.y; z++)
+			{
+				blocks[Chunk::baseSize.x * x + z] = {glm::vec3(pos.x + x, pos.y, pos.z + z), type};
+			}
+		}
+	}
+
+	void ChunkLayer::Update()
+	{
+		for (auto [pos, type] : blocks)
+		{
+			if (type == Sprites::BlockType::AIR)
+				airBlocks++;
+		}
 	}
 
 	Chunk::~Chunk()

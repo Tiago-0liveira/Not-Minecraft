@@ -13,8 +13,8 @@ namespace WorldGen::Block
 
 	struct BlockData
 	{
-		glm::ivec3 pos = {0, 0, 0};
-		Sprites::BlockType type = Sprites::BlockType::DIRT;
+		glm::vec3 pos = {0, 0, 0};
+		Sprites::BlockType type = Sprites::BlockType::AIR;
 		// Eventually add a pointer to metaData
 	};
 } // namespace WorldGen::Block
