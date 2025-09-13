@@ -3,3 +3,6 @@ cmake-build*
 /glew/
 /glfw/
 .idea
+.vs
+build
+out

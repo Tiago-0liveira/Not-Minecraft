@@ -44,7 +44,7 @@ namespace WorldGen
 
 #ifdef TIME_GEN_CHUNKS
 		time_gen_bool = false;
-		startTime = std::chrono::high_resolution_clock::now();
+		startTime = std::chrono::steady_clock::now();
 #endif
 
 
@@ -109,7 +109,7 @@ namespace WorldGen
 		if (finnishedGen && !time_gen_bool)
 		{
 			time_gen_bool = true;
-			const auto endTime = std::chrono::high_resolution_clock::now();
+			const auto endTime = std::chrono::steady_clock::now();
 			const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
 			std::cout << "World :: Generation time: " << duration.count() << " ms" << std::endl;
 		}
