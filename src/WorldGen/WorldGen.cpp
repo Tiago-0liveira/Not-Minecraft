@@ -81,19 +81,21 @@ namespace WorldGen
 		}
 		if (left) {
 			pushFace({
-				position.x - 0.5f, position.y - 0.5f, position.z - 0.5f, leftTexCoordsX, faceWidth, blockTypeFloat,
-				position.x - 0.5f, position.y - 0.5f, position.z + 0.5f, leftTexCoordsX + faceWidth, faceWidth, blockTypeFloat,
-				position.x - 0.5f, position.y + 0.5f, position.z + 0.5f, leftTexCoordsX + faceWidth, 0, blockTypeFloat,
-				position.x - 0.5f, position.y + 0.5f, position.z - 0.5f, leftTexCoordsX, 0, blockTypeFloat
+				position.x - 0.5f, position.y - 0.5f, position.z - 0.5f, leftTexCoordsX, 0, blockTypeFloat,
+				position.x - 0.5f, position.y - 0.5f, position.z + 0.5f, leftTexCoordsX + faceWidth, 0, blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z + 0.5f, leftTexCoordsX + faceWidth, 1, blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z - 0.5f, leftTexCoordsX, 1, blockTypeFloat
 				});
+
 		}
 		if (right) {
 			pushFace({
-				position.x + 0.5f, position.y - 0.5f, position.z - 0.5f, rightTexCoordsX + faceWidth, faceWidth, blockTypeFloat,
-				position.x + 0.5f, position.y + 0.5f, position.z - 0.5f, rightTexCoordsX + faceWidth, 0, blockTypeFloat,
-				position.x + 0.5f, position.y + 0.5f, position.z + 0.5f, rightTexCoordsX, 0, blockTypeFloat,
-				position.x + 0.5f, position.y - 0.5f, position.z + 0.5f, rightTexCoordsX, faceWidth, blockTypeFloat
+				position.x + 0.5f, position.y - 0.5f, position.z - 0.5f, rightTexCoordsX + faceWidth, 0, blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z + 0.5f, rightTexCoordsX, 0, blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z + 0.5f, rightTexCoordsX, 1, blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z - 0.5f, rightTexCoordsX + faceWidth, 1, blockTypeFloat
 				});
+
 		}
 		if (top) {
 			pushFace({

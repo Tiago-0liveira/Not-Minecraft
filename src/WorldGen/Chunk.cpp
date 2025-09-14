@@ -26,7 +26,6 @@ namespace WorldGen
 			else blockType = Sprites::BlockType::STONE;
 			chunkLayers.emplace_back(glm::vec3(position.x, y, position.z), blockType);
 		}
-		std::cout << "Chunk generated at " << position.x << " " << position.y << " " << position.z << std::endl;
 		const unsigned long layers = chunkLayers.size();
 		for (int layerI = 0; layerI < layers; layerI++)
 		{
