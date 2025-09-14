@@ -17,7 +17,7 @@
 namespace Sprites
 {
 	#define SPRITE_SIZE 64
-	inline const std::string SPRITE_BASE_PATH = "sprites/blocks/" + std::to_string(SPRITE_SIZE) + "x/";
+	inline const std::string SPRITE_BASE_PATH = std::string(PROJECT_ROOT) + "/sprites/blocks/" + std::to_string(SPRITE_SIZE) + "x/";
 
 	enum SpriteSheetFace
 	{

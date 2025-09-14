@@ -61,6 +61,9 @@ target_include_directories(Not_Minecraft PUBLIC imgui-cmake/imgui)
 target_include_directories(Not_Minecraft PUBLIC imgui-cmake/imgui/backends)
 
 set_target_properties(Not_Minecraft PROPERTIES
-    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     VS_STARTUP_PROJECT Not_Minecraft
+)
+
+target_compile_definitions(Not_Minecraft PRIVATE
+    PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
 )

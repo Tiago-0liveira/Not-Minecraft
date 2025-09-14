@@ -1,4 +1,5 @@
 #include <Graphics/SpriteSheet.hpp>
+#include <filesystem>
 
 namespace Sprites
 {
@@ -9,7 +10,7 @@ namespace Sprites
 		}
 		int nrChannels;
 		_data = stbi_load((SPRITE_BASE_PATH + path).c_str(), &pixels.x, &pixels.y, &nrChannels, 4);
-
+		std::cout << "Current working directory: " << std::filesystem::current_path() << "\n";
 		if (!_data)
 			throw std::runtime_error(std::format("Failed to load texture: %s\n", path));
 

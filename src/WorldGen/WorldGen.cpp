@@ -6,6 +6,224 @@
 
 namespace WorldGen
 {
+	void AppendCubeDetailedData(
+		const glm::vec3& position,
+		Sprites::BlockType blockType,
+		std::vector<GLfloat>& vertices,
+		std::vector<GLuint>& indices,
+		uint8_t faces)
+	{
+		constexpr float faceWidth = 1.0f / 6;
+		constexpr float backTexCoordsX = 1.0f / 6;
+		constexpr float leftTexCoordsX = 2.0f / 6;
+		constexpr float rightTexCoordsX = 3.0f / 6;
+		constexpr float topTexCoordsX = 4.0f / 6;
+		constexpr float bottomTexCoordsX = 5.0f / 6;
+
+		const float blockTypeFloat = static_cast<float>(blockType);
+
+		const bool front = Sprites::FRONT & faces;
+		const bool back = Sprites::BACK & faces;
+		const bool left = Sprites::LEFT & faces;
+		const bool right = Sprites::RIGHT & faces;
+		const bool top = Sprites::TOP & faces;
+		const bool bottom = Sprites::BOTTOM & faces;
+
+		// Count how many faces we’ll add
+		int faceCount = front + back + left + right + top + bottom;
+
+		// Each face has 4 vertices, 6 floats each (x,y,z,u,v,type)
+		size_t verticesNeeded = faceCount * 4 * 6;
+		size_t indicesNeeded = faceCount * 6;
+
+		// Resize vectors to fit new data
+		size_t vertexStart = vertices.size();
+		size_t indexStart = indices.size();
+		vertices.resize(vertexStart + verticesNeeded);
+		indices.resize(indexStart + indicesNeeded);
+
+		size_t vOffset = vertexStart;
+		size_t iOffset = indexStart;
+		GLuint baseIndex = static_cast<GLuint>(vertexStart / 6); // number of vertices already in buffer
+
+		auto pushFace = [&](const std::array<GLfloat, 4 * 6>& verts) {
+			// Copy vertex data
+			for (int i = 0; i < 24; i++) { // 4 vertices * 6 floats
+				vertices[vOffset++] = verts[i];
+			}
+
+			// Copy indices with proper offset
+			indices[iOffset++] = baseIndex + 0;
+			indices[iOffset++] = baseIndex + 1;
+			indices[iOffset++] = baseIndex + 2;
+			indices[iOffset++] = baseIndex + 2;
+			indices[iOffset++] = baseIndex + 3;
+			indices[iOffset++] = baseIndex + 0;
+
+			baseIndex += 4; // next face
+			};
+
+		if (front) {
+			pushFace({
+				position.x - 0.5f, position.y - 0.5f, position.z + 0.5f, 0,       0, blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z + 0.5f, faceWidth,0, blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z + 0.5f, faceWidth,1, blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z + 0.5f, 0,       1, blockTypeFloat
+				});
+		}
+		if (back) {
+			pushFace({
+				position.x - 0.5f, position.y - 0.5f, position.z - 0.5f, backTexCoordsX + faceWidth, 0, blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z - 0.5f, backTexCoordsX + faceWidth, 1, blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z - 0.5f, backTexCoordsX, 1, blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z - 0.5f, backTexCoordsX, 0, blockTypeFloat
+				});
+		}
+		if (left) {
+			pushFace({
+				position.x - 0.5f, position.y - 0.5f, position.z - 0.5f, leftTexCoordsX, faceWidth, blockTypeFloat,
+				position.x - 0.5f, position.y - 0.5f, position.z + 0.5f, leftTexCoordsX + faceWidth, faceWidth, blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z + 0.5f, leftTexCoordsX + faceWidth, 0, blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z - 0.5f, leftTexCoordsX, 0, blockTypeFloat
+				});
+		}
+		if (right) {
+			pushFace({
+				position.x + 0.5f, position.y - 0.5f, position.z - 0.5f, rightTexCoordsX + faceWidth, faceWidth, blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z - 0.5f, rightTexCoordsX + faceWidth, 0, blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z + 0.5f, rightTexCoordsX, 0, blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z + 0.5f, rightTexCoordsX, faceWidth, blockTypeFloat
+				});
+		}
+		if (top) {
+			pushFace({
+				position.x - 0.5f, position.y + 0.5f, position.z - 0.5f, topTexCoordsX, 1, blockTypeFloat,
+				position.x - 0.5f, position.y + 0.5f, position.z + 0.5f, topTexCoordsX, 0, blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z + 0.5f, topTexCoordsX + faceWidth, 0, blockTypeFloat,
+				position.x + 0.5f, position.y + 0.5f, position.z - 0.5f, topTexCoordsX + faceWidth, 1, blockTypeFloat
+				});
+		}
+		if (bottom) {
+			pushFace({
+				position.x - 0.5f, position.y - 0.5f, position.z - 0.5f, bottomTexCoordsX + faceWidth, 1, blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z - 0.5f, bottomTexCoordsX, 1, blockTypeFloat,
+				position.x + 0.5f, position.y - 0.5f, position.z + 0.5f, bottomTexCoordsX, 0, blockTypeFloat,
+				position.x - 0.5f, position.y - 0.5f, position.z + 0.5f, bottomTexCoordsX + faceWidth, 0, blockTypeFloat
+				});
+		}
+	}
+
+
+
+	//void AppendCubeDetailedData(
+	//	const glm::vec3& position,
+	//	Sprites::BlockType blockType,
+	//	std::vector<GLfloat>& vertices,
+	//	std::vector<GLuint>& indices,
+	//	uint8_t faces)
+	//{
+	//	static GLfloat verticesArr[6 * 4 * 6];
+	//	static GLuint indicesArr[6 * 6];
+	//	
+	//	unsigned int baseIndex = indices.empty() ? 0 : indices.back() + 4;
+	//	constexpr float backTexCoordsX = 1.0f / 6;
+	//	constexpr float leftTexCoordsX = 2.0f / 6;
+	//	constexpr float rightTexCoordsX = 3.0f / 6;
+	//	constexpr float topTexCoordsX = 4.0f / 6;
+	//	constexpr float bottomTexCoordsX = 5.0f / 6;
+	//	constexpr float faceWidth = 1.0f / 6;
+	//	const auto blockTypeFloat = static_cast<float>(blockType);
+	//	// create bools from SpriteSheetFace
+	//	const bool front = Sprites::FRONT & faces;
+	//	const bool back = Sprites::BACK & faces;
+	//	const bool left = Sprites::LEFT & faces;
+	//	const bool right = Sprites::RIGHT & faces;
+	//	const bool top = Sprites::TOP & faces;
+	//	const bool bottom = Sprites::BOTTOM & faces;
+	//	const short verticesNum = (front + back + left + right + top + bottom) * 6 * 4;
+	//	const short indicesNum = (front + back + left + right + top + bottom) * 6;
+	//	vertices.reserve(verticesNum);
+	//	indices.reserve(indicesNum);
+	//	if (front)
+	//	{
+	//		vertices.insert(vertices.end(), {
+	//			position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   0,		  0,		    blockTypeFloat,
+	//			position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   faceWidth, 0,			blockTypeFloat,
+	//			position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   faceWidth, 1,   blockTypeFloat,
+	//			position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   0,		  1,   blockTypeFloat,
+	//			});
+	//		indices.insert(indices.end(), {
+	//			0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+	//		});
+	//		baseIndex += 4;
+	//	}
+	//	if (back)
+	//	{
+	//		vertices.insert(vertices.end(), {
+	//			position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   backTexCoordsX + faceWidth, 0,   blockTypeFloat,
+	//			position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   backTexCoordsX + faceWidth, 1,   blockTypeFloat,
+	//			position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   backTexCoordsX, 1,   blockTypeFloat,
+	//			position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   backTexCoordsX, 0,   blockTypeFloat,
+	//			});
+	//		indices.insert(indices.end(), {
+	//			0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+	//			});
+	//		baseIndex += 4;
+	//	}
+	//	if (left)
+	//	{
+	//		vertices.insert(vertices.end(), {
+	//			position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   leftTexCoordsX, 0,   blockTypeFloat,
+	//			position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   leftTexCoordsX + faceWidth, 0,   blockTypeFloat,
+	//			position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   leftTexCoordsX + faceWidth, 1,   blockTypeFloat,
+	//			position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   leftTexCoordsX, 1,   blockTypeFloat,
+	//			});
+	//		indices.insert(indices.end(), {
+	//			0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+	//			});
+	//		baseIndex += 4;
+	//	}
+	//	if (right)
+	//	{
+	//		vertices.insert(vertices.end(), {
+	//			position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   rightTexCoordsX + faceWidth, 0,   blockTypeFloat,
+	//			position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   rightTexCoordsX + faceWidth, 1,   blockTypeFloat,
+	//			position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   rightTexCoordsX, 1,   blockTypeFloat,
+	//			position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   rightTexCoordsX, 0,   blockTypeFloat,
+	//			});
+	//		indices.insert(indices.end(), {
+	//			0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+	//			});
+	//		baseIndex += 4;
+	//	}
+	//	if (top)
+	//	{
+	//		vertices.insert(vertices.end(), {
+	//			position.x - 0.5f, position.y + 0.5f, position.z - 0.5f,   topTexCoordsX, 1,   blockTypeFloat,
+	//			position.x - 0.5f, position.y + 0.5f, position.z + 0.5f,   topTexCoordsX, 0,   blockTypeFloat,
+	//			position.x + 0.5f, position.y + 0.5f, position.z + 0.5f,   topTexCoordsX + faceWidth, 0,   blockTypeFloat,
+	//			position.x + 0.5f, position.y + 0.5f, position.z - 0.5f,   topTexCoordsX + faceWidth, 1,   blockTypeFloat,
+	//			});
+	//		indices.insert(indices.end(), {
+	//			0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+	//			});
+	//		baseIndex += 4;
+	//	}
+	//	if (bottom)
+	//	{
+	//		vertices.insert(vertices.end(), {
+	//			position.x - 0.5f, position.y - 0.5f, position.z - 0.5f,   bottomTexCoordsX + faceWidth, 1,   blockTypeFloat,
+	//			position.x + 0.5f, position.y - 0.5f, position.z - 0.5f,   bottomTexCoordsX, 1,   blockTypeFloat,
+	//			position.x + 0.5f, position.y - 0.5f, position.z + 0.5f,   bottomTexCoordsX, 0,   blockTypeFloat,
+	//			position.x - 0.5f, position.y - 0.5f, position.z + 0.5f,   bottomTexCoordsX + faceWidth, 0,   blockTypeFloat,
+	//			});
+	//		indices.insert(indices.end(), {
+	//			0 + baseIndex, 1 + baseIndex, 2 + baseIndex, 2 + baseIndex, 3 + baseIndex, 0 + baseIndex,         // Front face
+	//			});
+	//	}
+	//}
+
+
 	CubeDetailedData CreateCubeDetailedData(const glm::vec3 &position, const Sprites::BlockType &blockType, const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices, uint8_t faces)
 	{
 		unsigned int baseIndex = indices.empty() ? 0: indices.back() + 4;

@@ -22,6 +22,7 @@ namespace WorldGen
 		Sprites::BlockType blockType = Sprites::BlockType::AIR;
 	};
 
+	void AppendCubeDetailedData(const glm::vec3& position, const Sprites::BlockType blockType, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices, uint8_t faces);
 	CubeDetailedData CreateCubeDetailedData(const glm::vec3 &position, const Sprites::BlockType &blockType, const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices, uint8_t faces = 0xFF);
 	CubeData CreateCubeDataNew(const glm::vec3 &position, const Sprites::BlockType &blockType, const std::vector<GLuint> &indices);
 	void CreateCubeData(const glm::vec3 &position, const Sprites::BlockType &face, std::vector<GLfloat> &vertices, std::vector<GLuint> &indices, unsigned int indicesOffset = 0);

@@ -1,5 +1,5 @@
 #include <WorldGen/Chunk.hpp>
-
+#include "Utils.hpp"
 
 
 namespace WorldGen
@@ -57,9 +57,7 @@ namespace WorldGen
 						faces |= Sprites::SpriteSheetFace::BOTTOM;
 					if (faces == 0)
 						continue;
-					const CubeDetailedData cubeData = CreateCubeDetailedData(pos, type, vertices, indices, faces);
-					vertices.insert(vertices.end(), cubeData.vertices.begin(), cubeData.vertices.end());
-					indices.insert(indices.end(), cubeData.indices.begin(), cubeData.indices.end());
+					AppendCubeDetailedData(pos, type, vertices, indices, faces);
 				}
 			}
 		}

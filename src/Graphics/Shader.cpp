@@ -5,7 +5,7 @@ std::string get_file_content(const char* filename)
 	std::cout << "Reading file: " << filename << std::endl;
 
 	// Open the file in binary mode
-	std::ifstream in(filename, std::ios::binary);
+	std::ifstream in(std::string(PROJECT_ROOT) + "/" + filename, std::ios::binary);
 	if (!in) {
 		throw std::runtime_error(std::string("Error opening file: ") + strerror(errno));
 	}
